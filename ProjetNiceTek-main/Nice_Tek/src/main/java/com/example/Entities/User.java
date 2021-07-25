@@ -1,11 +1,13 @@
 package com.example.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,9 +26,9 @@ public class User implements Serializable {
     private String firstName ;
     private String lastName;
     private String email ;
-    private int telephone ;
+    private String telephone ;
     private String gender ;
-    private Date date_Creation ;
+    private LocalDate date_Creation ;
     private String userName ;
     private String passWord ;
     private String adress;
@@ -36,6 +38,9 @@ public class User implements Serializable {
             joinColumns = @JoinColumn(name = "id"),
             inverseJoinColumns = @JoinColumn(name = "id_role"))
     private List<RolesName> role_name = new ArrayList<RolesName>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE})
+    private List<Quest_Pro> quest_pros=new ArrayList<>();
 
 
 

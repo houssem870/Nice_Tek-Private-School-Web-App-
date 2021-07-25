@@ -5,6 +5,7 @@ import com.example.Security.Request.LoginForm;
 import com.example.Security.Request.SignUpForm;
 import com.example.Security.Response.SignInResponse;
 import com.example.utils.ErrorModel;
+import org.aspectj.apache.bcel.classfile.Utility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,9 @@ import com.example.Repository.RoleNameRepository;
 import com.example.Repository.UserRepository;
 import com.example.Security.JwtUtils;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 import java.util.ArrayList;
@@ -34,7 +38,6 @@ public class UserService {
     UserRepository userRepository;
     @Autowired
     RoleNameRepository roleNameRepository;
-
     @Autowired
     JwtUtils jwtUtils ;
     @Autowired
@@ -69,6 +72,7 @@ public class UserService {
             return  new ResponseEntity<>(new ErrorModel("LastName is empty"),HttpStatus.BAD_REQUEST); }
         user.setLastName(userTest.getLastName());
         user.setGender(userTest.getGender());
+
         user.setTelephone(userTest.getTelephone());
         if (userTest.getPassWord().length()<5){
             return  new ResponseEntity<>(new ErrorModel("Short PassWord"),HttpStatus.BAD_REQUEST); }
@@ -96,7 +100,7 @@ public class UserService {
         if(!isValidEmailAddress(signUpForm.getEmail())){
             return  new ResponseEntity<>(new ErrorModel("Invalid email"),HttpStatus.BAD_REQUEST);
         }
-        if(signUpForm.getRole_Name()=="Etudiant"){
+        if(role.equals("Etudiant")){
             Etudiant etudiant = new Etudiant() ;
             if (signUpForm.getFirstName().length()==0){
                 return  new ResponseEntity<>(new ErrorModel("UserName is empty"),HttpStatus.BAD_REQUEST); }
@@ -107,41 +111,44 @@ public class UserService {
             etudiant.setAdress(signUpForm.getAdress());
             etudiant.setEmail(signUpForm.getEmail());
             etudiant.setUserName(signUpForm.getUserName());
-            etudiant.setTelephone(signUpForm.getTelephone());
-            etudiant.setDate_Creation(signUpForm.getDate_Creation());
+            etudiant.setTelephone(signUpForm.getTelephone() );
+            etudiant.setGender(signUpForm.getGender());
+            LocalDate today = LocalDate.now();
+            etudiant.setDate_Creation(today);
             if (signUpForm.getPassWord().length()<5){
                 return  new ResponseEntity<>(new ErrorModel("Short PassWord"),HttpStatus.BAD_REQUEST); }
             String password = passwordEncoder().encode(signUpForm.getPassWord());
             etudiant.setPassWord(password);
-
             List<RolesName> rolesNameList=new ArrayList<>();
             rolesNameList.add(roleNameRepository.findByName(Role.Etudiant).get());
             etudiant.setRole_name(rolesNameList);
-
             userRepository.save(etudiant);
-            return new ResponseEntity<>(role,HttpStatus.OK);
+            return new ResponseEntity<>(etudiant,HttpStatus.OK);
 
 
         }
+        if (role.equals("Professionel")) {
 
-        Professionel professionel = new Professionel();
-        professionel.setFirstName(signUpForm.getFirstName());
-        professionel.setLastName(signUpForm.getLastName());
-        professionel.setAdress(signUpForm.getAdress());
-        professionel.setEmail(signUpForm.getEmail());
-        professionel.setDate_Creation(signUpForm.getDate_Creation());
-        professionel.setGender(signUpForm.getGender());
-        String password = passwordEncoder().encode(signUpForm.getPassWord());
-        professionel.setPassWord(password);
-        List<RolesName> rolesNameList=new ArrayList<>();
-        rolesNameList.add(roleNameRepository.findByName(Role.Professionel).get());
-        professionel.setRole_name(rolesNameList);
-        userRepository.save(professionel);
-        String token= jwtUtils.generateToken(signUpForm.getUserName());
-        return new ResponseEntity<>(professionel,HttpStatus.OK);
+            Professionel professionel = new Professionel();
+            professionel.setFirstName(signUpForm.getFirstName());
+            professionel.setLastName(signUpForm.getLastName());
+            professionel.setAdress(signUpForm.getAdress());
+            professionel.setEmail(signUpForm.getEmail());
+            LocalDate today = LocalDate.now();
+            professionel.setDate_Creation(today);
+            professionel.setTelephone(signUpForm.getTelephone());
+            professionel.setGender(signUpForm.getGender());
+            String password = passwordEncoder().encode(signUpForm.getPassWord());
+            professionel.setPassWord(password);
+            List<RolesName> rolesNameList = new ArrayList<>();
+            rolesNameList.add(roleNameRepository.findByName(Role.Professionel).get());
+            professionel.setRole_name(rolesNameList);
+            userRepository.save(professionel);
+            return new ResponseEntity<>(professionel, HttpStatus.OK);
 
 
-
+        }
+        return new ResponseEntity<>(new ErrorModel("Role is empty"),HttpStatus.BAD_REQUEST);
 
 
 
@@ -183,11 +190,11 @@ public class UserService {
     public ResponseEntity<?> getByUserName(String userName){
         if(!userRepository.findByUserName(userName).isPresent())
             return new ResponseEntity<>(new ErrorModel("User Not Found"),HttpStatus.BAD_REQUEST);
-       Optional<User> user=userRepository.findByUserName(userName);
+        Optional<User> user=userRepository.findByUserName(userName);
         return new ResponseEntity<>(user.get(),HttpStatus.OK);
 
     }
-    public ResponseEntity<?> getByUserName(int id){
+    public ResponseEntity<?> getById(int id){
         if(!userRepository.findById(id).isPresent())
             return new ResponseEntity<>(new ErrorModel("User Not Found"),HttpStatus.BAD_REQUEST);
         User user=userRepository.findById(id).get();
@@ -224,6 +231,7 @@ public class UserService {
         String password = passwordEncoder().encode(updatedUser.getPassWord());
         databaseUser.setPassWord(password);
 
+
         if (userRepository.findByEmail(updatedUser.getEmail()).isPresent()){
             return  new ResponseEntity<>(new ErrorModel(" Email is  used"),HttpStatus.BAD_REQUEST); }
 
@@ -232,8 +240,14 @@ public class UserService {
         }
         databaseUser.setEmail(updatedUser.getEmail());
 
+
+
         userRepository.save(databaseUser);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+    public List<User>        getAll(){
+        return  userRepository.findAll();
+
     }
 
 

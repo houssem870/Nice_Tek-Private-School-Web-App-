@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,10 +16,10 @@ public class UserTest {
     private String firstName ;
     private String lastName;
     private String email ;
-    private int telephone ;
+    private String telephone ;
     private String gender ;
-    private  Date last_Connection ;
-    private Date date_Creation ;
+
+    private LocalDate date_Creation ;
     private String userName ;
     private String passWord ;
     private String adress;
