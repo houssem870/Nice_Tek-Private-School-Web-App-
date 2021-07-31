@@ -13,7 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-
+@CrossOrigin
 @RestController
 public class UserController {
     @Autowired
@@ -24,6 +24,7 @@ public class UserController {
     public ResponseEntity<?> addUser(@RequestBody UserTest user){
         return userService.addUser(user);
     }
+
     @PostMapping("/auth/signUp")
     public ResponseEntity<?> SignUp(@RequestBody SignUpForm signUpForm){
         return userService.signUp(signUpForm);

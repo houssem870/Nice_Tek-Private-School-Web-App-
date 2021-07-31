@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="niceteck@localhost">
-  <database-model serializer="dbm" dbms="MARIADB" family-id="MARIADB" format-version="4.19">
+  <database-model serializer="dbm" dbms="MARIADB" family-id="MARIADB" format-version="4.23">
     <root id="1">
       <ServerVersion>10.4.11</ServerVersion>
       <DefaultEngine>InnoDB</DefaultEngine>

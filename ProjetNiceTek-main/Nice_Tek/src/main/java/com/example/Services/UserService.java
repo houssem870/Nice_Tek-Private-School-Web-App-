@@ -89,9 +89,9 @@ public class UserService {
 
 
     public ResponseEntity<?> signUp (SignUpForm signUpForm){
-        String role=signUpForm.getRole_Name();
+        String role=signUpForm.getRole();
 
-        if (userRepository.findByUserName(signUpForm.getUserName()).isPresent()){
+        if (userRepository.findByUserName(signUpForm.getUsername()).isPresent()){
             return  new ResponseEntity<>(new ErrorModel("user name is used"),HttpStatus.BAD_REQUEST);
         }
         if (userRepository.findByEmail(signUpForm.getEmail()).isPresent()){
@@ -110,14 +110,14 @@ public class UserService {
             etudiant.setLastName(signUpForm.getLastName());
             etudiant.setAdress(signUpForm.getAdress());
             etudiant.setEmail(signUpForm.getEmail());
-            etudiant.setUserName(signUpForm.getUserName());
+            etudiant.setUserName(signUpForm.getUsername());
             etudiant.setTelephone(signUpForm.getTelephone() );
             etudiant.setGender(signUpForm.getGender());
             LocalDate today = LocalDate.now();
             etudiant.setDate_Creation(today);
-            if (signUpForm.getPassWord().length()<5){
+            if (signUpForm.getPassword().length()<5){
                 return  new ResponseEntity<>(new ErrorModel("Short PassWord"),HttpStatus.BAD_REQUEST); }
-            String password = passwordEncoder().encode(signUpForm.getPassWord());
+            String password = passwordEncoder().encode(signUpForm.getPassword());
             etudiant.setPassWord(password);
             List<RolesName> rolesNameList=new ArrayList<>();
             rolesNameList.add(roleNameRepository.findByName(Role.Etudiant).get());
@@ -138,7 +138,8 @@ public class UserService {
             professionel.setDate_Creation(today);
             professionel.setTelephone(signUpForm.getTelephone());
             professionel.setGender(signUpForm.getGender());
-            String password = passwordEncoder().encode(signUpForm.getPassWord());
+            professionel.setUserName(signUpForm.getUsername());
+            String password = passwordEncoder().encode(signUpForm.getPassword());
             professionel.setPassWord(password);
             List<RolesName> rolesNameList = new ArrayList<>();
             rolesNameList.add(roleNameRepository.findByName(Role.Professionel).get());
@@ -164,10 +165,10 @@ public class UserService {
     public ResponseEntity<?> signIn ( LoginForm loginform) {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginform.getUserName(), loginform.getPassWord()));
+                new UsernamePasswordAuthenticationToken(loginform.getUsername(), loginform.getPassword()));
 
 
-        String jwt = jwtUtils.generateToken(loginform.getUserName());
+        String jwt = jwtUtils.generateToken(loginform.getUsername());
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         return new ResponseEntity<>(new SignInResponse(jwt, userDetails.getUsername(), userDetails.getAuthorities()),HttpStatus.ACCEPTED);

@@ -1,5 +1,6 @@
 package com.example.Security.Request;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,9 +8,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.Date;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 public class SignUpForm {
     private Long id ;
     private String firstName ;
@@ -17,10 +16,10 @@ public class SignUpForm {
     private String email ;
     private String telephone ;
     private String gender ;
-    private LocalDate date_Creation ;
-    private String userName ;
-    private String passWord ;
+    private LocalDate dateCreation ;
+    private String username ;
+    private String password ;
     private String adress;
-    private String role_Name;
+    private String role;
 
 }
